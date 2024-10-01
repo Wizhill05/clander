@@ -38,7 +38,8 @@ SizedBox TopBar() {
   );
 }
 
-Widget Calender(double sWidth, int startDay, int noDays, int lastMonthDays) {
+Widget Calender(
+    double sWidth, int startDay, int noDays, int lastMonthDays, int today) {
   List dList = makeDateTable(startDay, noDays, lastMonthDays);
   for (int i = 0; i < 6; i++) {
     debugPrint(
@@ -49,20 +50,20 @@ Widget Calender(double sWidth, int startDay, int noDays, int lastMonthDays) {
     padding: EdgeInsets.fromLTRB(25, 40, 25, 0),
     child: Container(
       width: sWidth - 50,
-      height: (sWidth - 50) * 6 / 7,
+      height: (sWidth - 50),
       decoration: BoxDecoration(color: Colors.transparent),
       child: GridView.count(
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         crossAxisCount: 7,
-        children: List.generate(42, (index) {
+        children: List.generate(49, (index) {
           int i = (index / 7).floor();
           int j = index % 7;
 
           return Container(
             decoration: BoxDecoration(
                 color: Colors.transparent, border: dateBorder(i, j)),
-            child: dateObject(dList, i, j),
+            child: dateObject(dList, i, j, today),
           );
         }),
       ),
@@ -85,6 +86,13 @@ Border dateBorder(int i, int j) {
     r = 0;
   }
 
+  if (i == 6) {
+    t = 0;
+    b = 0;
+    l = 0;
+    r = 0;
+  }
+
   return Border(
     top: BorderSide(color: toColor("e6e6e6", opacity: t), width: 1),
     bottom: BorderSide(color: toColor("e6e6e6", opacity: b), width: 1),
@@ -93,25 +101,51 @@ Border dateBorder(int i, int j) {
   );
 }
 
-Widget dateObject(List dList, int i, int j) {
+Widget dateObject(List dList, int i, int j, int today) {
   int date = dList[i][j];
   String dateStr = "${date.abs()}";
   String dateClr = "e6e6e6";
+  Widget Dot = Container();
+  List dayList = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   if (date < 0) {
     dateClr = "7f7f7f";
   }
 
   if ((j == 0) && (date > 0)) {
-    dateClr = "ff6666";
+    dateClr = "ff6969";
   }
-  return Container(
-    child: Center(
+
+  if (date == today) {
+    Dot = Padding(
+      padding: const EdgeInsets.fromLTRB(37, 8, 8, 37),
+      child: Align(
+          alignment: Alignment.topRight,
+          child: Container(
+            decoration: BoxDecoration(
+                gradient: RadialGradient(colors: [
+              toColor("dd5050"),
+              Colors.transparent
+            ], stops: [
+              1,
+              1,
+            ])),
+          )),
+    );
+  }
+
+  if (date > 999) {
+    dateStr = dayList[date - 1000];
+  }
+
+  return Stack(children: [
+    Center(
       child: Text(
         dateStr,
         style: GoogleFonts.instrumentSerif(
             fontSize: 20, color: toColor(dateClr), fontWeight: FontWeight.w500),
       ),
     ),
-  );
+    Dot,
+  ]);
 }

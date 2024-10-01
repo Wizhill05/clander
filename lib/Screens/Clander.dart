@@ -17,7 +17,7 @@ class Home extends StatelessWidget {
           child: Column(
             children: [
               TopBar(),
-              Calender(sWidth, 5, 31, 29),
+              Calender(sWidth, 5, 31, 29, 14),
             ],
           ),
         ),

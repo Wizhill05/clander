@@ -38,25 +38,24 @@ SizedBox TopBar() {
   );
 }
 
-Widget Calender(
-    double sWidth, int startDay, int noDays, int lastMonthDays, int today) {
+Widget Calender(double sWidth, int startDay, int noDays, int lastMonthDays,
+    DateTime today) {
   List dList = makeDateTable(startDay, noDays, lastMonthDays);
   for (int i = 0; i < 6; i++) {
     debugPrint(
         "\t${dList[i][0]}\t${dList[i][1]}\t${dList[i][2]}\t${dList[i][3]}\t${dList[i][4]}\t${dList[i][5]}\t${dList[i][6]}");
   }
-
   return Padding(
-    padding: EdgeInsets.fromLTRB(25, 40, 25, 0),
+    padding: EdgeInsets.fromLTRB(25, 0, 25, 0),
     child: Container(
       width: sWidth - 50,
-      height: (sWidth - 50),
+      height: (sWidth - 50) * 6 / 7,
       decoration: BoxDecoration(color: Colors.transparent),
       child: GridView.count(
         physics: NeverScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         crossAxisCount: 7,
-        children: List.generate(49, (index) {
+        children: List.generate(42, (index) {
           int i = (index / 7).floor();
           int j = index % 7;
 
@@ -101,12 +100,11 @@ Border dateBorder(int i, int j) {
   );
 }
 
-Widget dateObject(List dList, int i, int j, int today) {
+Widget dateObject(List dList, int i, int j, DateTime today) {
   int date = dList[i][j];
   String dateStr = "${date.abs()}";
   String dateClr = "e6e6e6";
   Widget Dot = Container();
-  List dayList = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   if (date < 0) {
     dateClr = "7f7f7f";
@@ -116,26 +114,10 @@ Widget dateObject(List dList, int i, int j, int today) {
     dateClr = "ff6969";
   }
 
-  if (date == today) {
-    Dot = Padding(
-      padding: const EdgeInsets.fromLTRB(37, 8, 8, 37),
-      child: Align(
-          alignment: Alignment.topRight,
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: RadialGradient(colors: [
-              toColor("dd5050"),
-              Colors.transparent
-            ], stops: [
-              1,
-              1,
-            ])),
-          )),
-    );
-  }
-
-  if (date > 999) {
-    dateStr = dayList[date - 1000];
+  if ((date == today.day) &&
+      (today.month == DateTime.now().month) &&
+      (today.year == DateTime.now().year)) {
+    Dot = createDot();
   }
 
   return Stack(children: [
@@ -148,4 +130,108 @@ Widget dateObject(List dList, int i, int j, int today) {
     ),
     Dot,
   ]);
+}
+
+Widget monthChoose(double sWidth, DateTime today, Function update) {
+  return Padding(
+      padding: EdgeInsets.fromLTRB(
+          25 + sWidth / 16 - 2, 30, 25 + sWidth / 16 - 2, 0),
+      child: Container(
+          width: (sWidth - 50 - sWidth / 8) + 4,
+          height: ((sWidth - 50 - sWidth / 8) * 2 / 6) + 4,
+          decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border(
+                top: BorderSide(color: toColor("e6e6e6"), width: 2),
+                bottom: BorderSide(color: toColor("e6e6e6"), width: 2),
+                left: BorderSide(color: toColor("e6e6e6"), width: 2),
+                right: BorderSide(color: toColor("e6e6e6"), width: 2),
+              )),
+          child: GridView.count(
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              crossAxisCount: 6,
+              children: List.generate(12, (index) {
+                Widget Dot = Container();
+                Color textColor = toColor("e6e6e6");
+                if ((index == DateTime.now().month - 1) &&
+                    (today.year == DateTime.now().year)) {
+                  Dot = createDot();
+                }
+                if ((index == today.month - 1)) {
+                  textColor = toColor("ff6969");
+                }
+
+                return Stack(children: [
+                  InkWell(
+                    onTap: () {
+                      update(index);
+                    },
+                    child: Center(
+                      child: Text(
+                        "${index + 1}",
+                        style: GoogleFonts.instrumentSerif(
+                            fontSize: 20,
+                            color: textColor,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                  Dot
+                ]);
+              }))));
+}
+
+Widget dayRow(double sWidth) {
+  List days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  List dateClr = [
+    "ff6969",
+    "e6e6e6",
+    "e6e6e6",
+    "e6e6e6",
+    "e6e6e6",
+    "e6e6e6",
+    "e6e6e6"
+  ];
+  return Padding(
+      padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
+      child: Container(
+          width: sWidth - 50,
+          height: (sWidth - 50) / 7,
+          decoration: BoxDecoration(color: Colors.transparent),
+          child: GridView.count(
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              crossAxisCount: 7,
+              children: List.generate(7, (index) {
+                return Center(
+                  child: Text(
+                    days[index],
+                    style: GoogleFonts.instrumentSerif(
+                        fontSize: 20,
+                        color: toColor(dateClr[index]),
+                        fontWeight: FontWeight.w500),
+                  ),
+                );
+              }))));
+}
+
+Widget createDot() {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(0, 9, 9, 0),
+    child: Align(
+        alignment: Alignment.topRight,
+        child: Container(
+          width: 4,
+          height: 4,
+          decoration: BoxDecoration(
+              gradient: RadialGradient(colors: [
+            toColor("dd5050"),
+            Colors.transparent
+          ], stops: const [
+            1,
+            1,
+          ])),
+        )),
+  );
 }

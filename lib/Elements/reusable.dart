@@ -66,11 +66,6 @@ List makeDateTable(int startDay, int noDays, int lastMonthDays) {
       }
     }
   }
-  List a = [
-    [1000, 1001, 1002, 1003, 1004, 1005, 1006]
-  ];
-  dList.addAll(a);
-
   return dList;
 }
 
